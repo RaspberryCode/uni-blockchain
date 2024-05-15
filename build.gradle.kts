@@ -1,21 +1,28 @@
 plugins {
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "1.9.23" apply false // apply false to not apply this plugin to the root project
 }
 
 group = "pl.softwarekitchen.uni.blockchain"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
 
-dependencies {
-    testImplementation(kotlin("test"))
-}
+    repositories {
+        mavenCentral()
+    }
 
-tasks.test {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(21)
+    dependencies {
+        "testImplementation"(kotlin("test"))
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "21"
+        }
+    }
 }
