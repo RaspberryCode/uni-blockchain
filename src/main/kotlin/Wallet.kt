@@ -3,49 +3,45 @@ import java.security.PrivateKey
 import java.security.PublicKey
 
 data class Wallet(val publicKey: PublicKey, val privateKey: PrivateKey, val blockChain: Blockchain) {
-
     companion object {
         fun create(blockChain: Blockchain): Wallet {
             val generator = KeyPairGenerator.getInstance("RSA")
             generator.initialize(2048)
             val keyPair = generator.generateKeyPair()
-
             return Wallet(keyPair.public, keyPair.private, blockChain)
         }
     }
 
     val balance: Int
-        get() {
-            return getMyTransactions().sumOf { it.amount }
-        }
+        get() = blockChain.utxo.filterValues { it.isMine(publicKey) }.values.sumOf { it.amount }
 
-    private fun getMyTransactions(): Collection<TransactionOutput> {
-        return blockChain.UTXO.filterValues { it.isMine(publicKey) }.values
+    fun createInitialTransaction(amount: Int): Transaction {
+        val tx = Transaction.create(publicKey, publicKey, amount)
+        tx.outputs.add(TransactionOutput(publicKey, amount, tx.hash))
+        tx.sign(privateKey)
+        return tx
     }
 
     fun sendFundsTo(recipient: PublicKey, amountToSend: Int): Transaction {
-
-        if (amountToSend > balance) {
-            throw IllegalArgumentException("Insufficient funds")
-        }
-
-        val tx = Transaction.create(sender = publicKey, recipient = publicKey, amount = amountToSend)
-        tx.outputs.add(TransactionOutput(recipient = recipient, amount = amountToSend, transactionHash = tx.hash))
+        val tx = Transaction.create(publicKey, recipient, amountToSend)
+        val myTransactions = blockChain.utxo.filterValues { it.isMine(publicKey) }.values
+        val collectedOutputs = mutableListOf<TransactionOutput>()
 
         var collectedAmount = 0
-        for (myTx in getMyTransactions()) {
-            collectedAmount += myTx.amount
-            tx.inputs.add(myTx)
-
-            if (collectedAmount > amountToSend) {
-                val change = collectedAmount - amountToSend
-                tx.outputs.add(TransactionOutput(recipient = publicKey, amount = change, transactionHash = tx.hash))
-            }
-
-            if (collectedAmount >= amountToSend) {
-                break
-            }
+        for (output in myTransactions) {
+            if (collectedAmount >= amountToSend) break
+            collectedOutputs.add(output)
+            collectedAmount += output.amount
         }
-        return tx.sign(privateKey)
+
+        tx.inputs.addAll(collectedOutputs)
+        tx.outputs.add(TransactionOutput(recipient, amountToSend, tx.hash))
+
+        if (collectedAmount > amountToSend) {
+            tx.outputs.add(TransactionOutput(publicKey, collectedAmount - amountToSend, tx.hash))
+        }
+
+        tx.sign(privateKey)
+        return tx
     }
 }

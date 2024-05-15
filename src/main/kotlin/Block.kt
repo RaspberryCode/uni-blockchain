@@ -7,19 +7,17 @@ data class Block(
     val nonce: Long = 0,
     var hash: String = ""
 ) {
-
     init {
         hash = calculateHash()
     }
 
-    fun calculateHash(): String {
-        return "$previousHash$transactions$timestamp$nonce".hash()
-    }
+    fun calculateHash(): String =
+        "$previousHash$transactions$timestamp$nonce".hash()
 
     fun addTransaction(transaction: Transaction): Block {
-
-        if (transaction.isSignatureValid())
+        if (transaction.isSignatureValid()) {
             transactions.add(transaction)
+        }
         return this
     }
 }
