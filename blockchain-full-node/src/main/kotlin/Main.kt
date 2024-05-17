@@ -34,8 +34,29 @@ fun main(args: Array<String>) {
     runApplication<FullNodeApplication>(*args)
 }
 
+@Configuration
+class ResilienceConfig {
+    private final val timeBetweenRetries: Long = 1000
+    private final val maxNumberOfRetries: Int = 3
+
+    @Bean
+    fun retryConfig(): RetryConfig {
+        return RetryConfig.custom<Any>()
+            .maxAttempts(maxNumberOfRetries)
+            .intervalFunction(IntervalFunction.ofExponentialBackoff(timeBetweenRetries, 2.0))
+            .retryExceptions(Exception::class.java)
+            .build()
+    }
+}
+
+@ConfigurationProperties(prefix = "fullnode")
+data class FullNodeConfig(
+    var currentAddress: String,
+    var peers: List<String> = mutableListOf()
+)
+
 @RestController
-class BlockchainController(
+class Controller(
     val blockchainService: BlockchainService,
     val nodeService: NodeService
 ) {
@@ -114,27 +135,6 @@ class BlockchainService {
         }
     }
 }
-
-@Configuration
-class ResilienceConfig {
-    private final val timeBetweenRetries: Long = 1000
-    private final val maxNumberOfRetries: Int = 3
-
-    @Bean
-    fun retryConfig(): RetryConfig {
-        return RetryConfig.custom<Any>()
-            .maxAttempts(maxNumberOfRetries)
-            .intervalFunction(IntervalFunction.ofExponentialBackoff(timeBetweenRetries, 2.0))
-            .retryExceptions(Exception::class.java)
-            .build()
-    }
-}
-
-@ConfigurationProperties(prefix = "fullnode")
-data class FullNodeConfig(
-    var currentAddress: String,
-    var peers: List<String> = mutableListOf()
-)
 
 @Service
 class NodeService(
