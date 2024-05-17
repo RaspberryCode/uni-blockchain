@@ -1,0 +1,8 @@
+server:
+  port: 5002
+
+fullnode:
+  currentAddress: "http://localhost:${server.port}"
+  peers:
+    - "http://localhost:5001"
+    - "http://localhost:5003"
