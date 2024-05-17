@@ -3,4 +3,4 @@ plugins {
 }
 rootProject.name = "uni-blockchain"
 
-include("blockchain-full-node", "blockchain-miner-node")
+include("blockchain-full-node", "blockchain-miner-node", "user-api")

@@ -1,4 +1,0 @@
-package client
-
-fun main() {
-}

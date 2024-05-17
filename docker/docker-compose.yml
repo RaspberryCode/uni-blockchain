@@ -6,8 +6,8 @@ services:
       dockerfile: docker/miner/Dockerfile
     image: blockchain-miner
     environment:
-      - FULLNODE_CURRENT_ADDRESS=http://miner1:5000
-      - FULLNODE_PEERS=http://miner2:5000,http://miner3:5000
+      - MINERNODE_CURRENT_ADDRESS=http://miner1:5000
+      - MINERNODE_PEERS=http://full-node1:5000,http://full-node2:5000,http://full-node3:5000
     ports:
       - "5001:5000"
     deploy:
@@ -15,15 +15,19 @@ services:
         limits:
           cpus: '2.0'
           memory: 1G
+    depends_on:
+      - full-node1
+      - full-node2
+      - full-node3
 
   miner2:
     build:
       context: ../
-      dockerfile: docker/miner/dockerfile
+      dockerfile: docker/miner/Dockerfile
     image: blockchain-miner
     environment:
-      - FULLNODE_CURRENT_ADDRESS=http://miner2:5000
-      - FULLNODE_PEERS=http://miner1:5000,http://miner3:5000
+      - MINERNODE_CURRENT_ADDRESS=http://miner2:5000
+      - MINERNODE_PEERS=http://full-node1:5000,http://full-node2:5000,http://full-node3:5000
     ports:
       - "5002:5000"
     deploy:
@@ -31,15 +35,19 @@ services:
         limits:
           cpus: '2.0'
           memory: 1G
+    depends_on:
+      - full-node1
+      - full-node2
+      - full-node3
 
   miner3:
     build:
       context: ../
-      dockerfile: docker/miner/dockerfile
+      dockerfile: docker/miner/Dockerfile
     image: blockchain-miner
     environment:
-      - FULLNODE_CURRENT_ADDRESS=http://miner3:5000
-      - FULLNODE_PEERS=http://miner2:5002,http://miner3:5001
+      - MINERNODE_CURRENT_ADDRESS=http://miner3:5000
+      - MINERNODE_PEERS=http://full-node1:5000,http://full-node2:5000,http://full-node3:5000
     ports:
       - "5003:5000"
     deploy:
@@ -47,6 +55,10 @@ services:
         limits:
           cpus: '2.0'
           memory: 1G
+    depends_on:
+      - full-node1
+      - full-node2
+      - full-node3
 
   full-node1:
     build:
@@ -67,7 +79,7 @@ services:
   full-node2:
     build:
       context: ../
-      dockerfile: docker/full-node/dockerfile
+      dockerfile: docker/full-node/Dockerfile
     image: blockchain-full-node
     environment:
       - FULLNODE_CURRENT_ADDRESS=http://full-node2:5000
@@ -83,7 +95,7 @@ services:
   full-node3:
     build:
       context: ../
-      dockerfile: docker/full-node/dockerfile
+      dockerfile: docker/full-node/Dockerfile
     image: blockchain-full-node
     environment:
       - FULLNODE_CURRENT_ADDRESS=http://full-node3:5000
@@ -95,3 +107,18 @@ services:
         limits:
           cpus: '2.0'
           memory: 1G
+
+  user-api:
+    build:
+      context: ../
+      dockerfile: docker/user-api/Dockerfile
+    image: blockchain-user-api
+    environment:
+      - USERAPI_CURRENT_ADDRESS=http://user-api:5000
+      - USERAPI_PEERS=http://full-node1:5000,http://full-node2:5000,http://full-node3:5000
+    ports:
+      - "8080:8080"
+    depends_on:
+      - full-node1
+      - full-node2
+      - full-node3
