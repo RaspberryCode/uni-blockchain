@@ -1,6 +1,0 @@
-userapi:
-  currentAddress: "http://localhost:${server.port}"
-  peers:
-    - "http://localhost:5001"
-    - "http://localhost:5002"
-    - "http://localhost:5003"

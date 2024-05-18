@@ -1,0 +1,9 @@
+server:
+  port: 5000
+node:
+  address: "http://localhost:${server.port}"
+  initial-peers:
+    - "http://localhost:5001"
+    - "http://localhost:5002"
+    - "http://localhost:5003"
+  initial-block-difficulty: 4

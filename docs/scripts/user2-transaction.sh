@@ -11,8 +11,8 @@ RECEIVER_USERNAME=$1
 VALUE=$2
 
 # User credentials
-USERNAME="user1"
-PASSWORD="password1"
+USERNAME="user2"
+PASSWORD="password2"
 
 # Transaction API endpoint
 API_URL="http://localhost:8080/user/transactions"

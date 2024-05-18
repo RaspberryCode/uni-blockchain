@@ -1,15 +1,16 @@
 version: '3.8'
 services:
-  miner1:
+  miner-node1:
     build:
       context: ../
-      dockerfile: docker/miner/Dockerfile
-    image: blockchain-miner
+      dockerfile: docker/miner-node/Dockerfile
+    image: blockchain-miner-node
     environment:
-      - MINERNODE_CURRENT_ADDRESS=http://miner1:5000
-      - MINERNODE_PEERS=http://full-node1:5000,http://full-node2:5000,http://full-node3:5000
+      - NODE_ADDRESS=http://miner-node1:5000
+      - NODE_INITIAL_PEERS=${NODE_INITIAL_PEERS}
+      - NODE_INITIAL_BLOCK_DIFFICULTY=${NODE_INITIAL_BLOCK_DIFFICULTY}
     ports:
-      - "5001:5000"
+      - "5011:5000"
     deploy:
       resources:
         limits:
@@ -20,16 +21,17 @@ services:
       - full-node2
       - full-node3
 
-  miner2:
+  miner-node2:
     build:
       context: ../
-      dockerfile: docker/miner/Dockerfile
-    image: blockchain-miner
+      dockerfile: docker/miner-node/Dockerfile
+    image: blockchain-miner-node
     environment:
-      - MINERNODE_CURRENT_ADDRESS=http://miner2:5000
-      - MINERNODE_PEERS=http://full-node1:5000,http://full-node2:5000,http://full-node3:5000
+      - NODE_ADDRESS=http://miner-node2:5000
+      - NODE_INITIAL_PEERS=${NODE_INITIAL_PEERS}
+      - NODE_INITIAL_BLOCK_DIFFICULTY=${NODE_INITIAL_BLOCK_DIFFICULTY}
     ports:
-      - "5002:5000"
+      - "5012:5000"
     deploy:
       resources:
         limits:
@@ -40,16 +42,17 @@ services:
       - full-node2
       - full-node3
 
-  miner3:
+  miner-node3:
     build:
       context: ../
-      dockerfile: docker/miner/Dockerfile
-    image: blockchain-miner
+      dockerfile: docker/miner-node/Dockerfile
+    image: blockchain-miner-node
     environment:
-      - MINERNODE_CURRENT_ADDRESS=http://miner3:5000
-      - MINERNODE_PEERS=http://full-node1:5000,http://full-node2:5000,http://full-node3:5000
+      - NODE_ADDRESS=http://miner-node3:5000
+      - NODE_INITIAL_PEERS=${NODE_INITIAL_PEERS}
+      - NODE_INITIAL_BLOCK_DIFFICULTY=${NODE_INITIAL_BLOCK_DIFFICULTY}
     ports:
-      - "5003:5000"
+      - "5013:5000"
     deploy:
       resources:
         limits:
@@ -66,15 +69,11 @@ services:
       dockerfile: docker/full-node/Dockerfile
     image: blockchain-full-node
     environment:
-      - FULLNODE_CURRENT_ADDRESS=http://full-node1:5000
-      - FULLNODE_PEERS=http://full-node2:5000,http://full-node3:5000
+      - NODE_ADDRESS=http://full-node1:5000
+      - NODE_INITIAL_PEERS=${NODE_INITIAL_PEERS}
+      - NODE_INITIAL_BLOCK_DIFFICULTY=${NODE_INITIAL_BLOCK_DIFFICULTY}
     ports:
       - "5001:5000"
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 1G
 
   full-node2:
     build:
@@ -82,15 +81,11 @@ services:
       dockerfile: docker/full-node/Dockerfile
     image: blockchain-full-node
     environment:
-      - FULLNODE_CURRENT_ADDRESS=http://full-node2:5000
-      - FULLNODE_PEERS=http://full-node1:5000,http://full-node3:5000
+      - NODE_ADDRESS=http://full-node2:5000
+      - NODE_INITIAL_PEERS=${NODE_INITIAL_PEERS}
+      - NODE_INITIAL_BLOCK_DIFFICULTY=${NODE_INITIAL_BLOCK_DIFFICULTY}
     ports:
       - "5002:5000"
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 1G
 
   full-node3:
     build:
@@ -98,24 +93,21 @@ services:
       dockerfile: docker/full-node/Dockerfile
     image: blockchain-full-node
     environment:
-      - FULLNODE_CURRENT_ADDRESS=http://full-node3:5000
-      - FULLNODE_PEERS=http://full-node1:5000,http://full-node2:5000
+      - NODE_ADDRESS=http://full-node3:5000
+      - NODE_INITIAL_PEERS=${NODE_INITIAL_PEERS}
+      - NODE_INITIAL_BLOCK_DIFFICULTY=${NODE_INITIAL_BLOCK_DIFFICULTY}
     ports:
       - "5003:5000"
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 1G
 
-  user-api:
+  user-api-node:
     build:
       context: ../
-      dockerfile: docker/user-api/Dockerfile
-    image: blockchain-user-api
+      dockerfile: docker/user-api-node/Dockerfile
+    image: blockchain-user-api-node
     environment:
-      - USERAPI_CURRENT_ADDRESS=http://user-api:5000
-      - USERAPI_PEERS=http://full-node1:5000,http://full-node2:5000,http://full-node3:5000
+      - NODE_ADDRESS=http://user-api-node:8080
+      - NODE_INITIAL_PEERS=${NODE_INITIAL_PEERS}
+      - NODE_INITIAL_BLOCK_DIFFICULTY=${NODE_INITIAL_BLOCK_DIFFICULTY}
     ports:
       - "8080:8080"
     depends_on:

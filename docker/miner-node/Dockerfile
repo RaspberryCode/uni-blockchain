@@ -5,7 +5,7 @@ FROM openjdk:21-slim
 WORKDIR /app
 
 # Copy the built jar file into the container
-COPY full-node/build/libs/full-node-*.jar /app/full-node.jar
+COPY miner-node/build/libs/miner-node-*.jar /app/miner-node.jar
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
@@ -13,5 +13,5 @@ EXPOSE 5000
 # Define environment variable for port
 ENV MINER_PORT=5000
 
-# Run full-node.jar when the container launches
-CMD ["java", "-jar", "full-node.jar", "-Dport=${MINER_PORT}"]
+# Run miner-node.jar when the container launches
+CMD ["java", "-jar", "miner-node.jar", "-Dport=${MINER_PORT}"]
